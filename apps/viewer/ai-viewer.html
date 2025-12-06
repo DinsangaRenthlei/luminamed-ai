@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuminaMed - AI Overlay Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        #header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            padding: 1.5rem 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status {
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        #container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 2rem;
+        }
+
+        #sidebar {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #60a5fa;
+            font-size: 1.1rem;
+        }
+
+        #uploadForm {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .file-upload-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #404040;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #fff;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button[type="submit"] {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        button[type="submit"]:disabled {
+            background: #404040;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #metadata {
+            background: #1a1a1a;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .metadata-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .metadata-row:last-child {
+            border-bottom: none;
+        }
+
+        .metadata-label {
+            color: #9ca3af;
+        }
+
+        .metadata-value {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        #findingsList {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .finding-item {
+            background: #1a1a1a;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .finding-item:hover {
+            background: #242424;
+            transform: translateX(4px);
+        }
+
+        .finding-item.abnormal {
+            border-left-color: #ef4444;
+        }
+
+        .finding-confidence {
+            color: #9ca3af;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        #viewer {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #imageContainer {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        #medicalImage {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            display: block;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: auto;
+            cursor: crosshair;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            border: 4px solid #404040;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .placeholder {
+            text-align: center;
+            color: #6b7280;
+            padding: 4rem;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        #impression {
+            background: #1a1a1a;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .impression-title {
+            font-weight: 600;
+            color: #60a5fa;
+            margin-bottom: 0.75rem;
+        }
+
+        .impression-text {
+            line-height: 1.6;
+            color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div class="header-content">
+            <div class="logo">
+                <span style="font-size: 2rem;">🩻</span>
+                <span>LuminaMed - AI Overlay Viewer</span>
+            </div>
+            <div class="status">
+                <span id="statusText">Ready</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="container">
+        <!-- Sidebar -->
+        <div id="sidebar">
+            <!-- Upload Section -->
+            <div class="section">
+                <div class="section-title">📤 Upload DICOM</div>
+                <form id="uploadForm">
+                    <label for="dicomFile" class="file-upload-btn">
+                        Choose DICOM File
+                    </label>
+                    <input type="file" id="dicomFile" accept=".dcm,image/*" required>
+                    <div id="fileName" style="color: #9ca3af; font-size: 0.85rem; margin-top: 0.5rem;"></div>
+                    
+                    <textarea 
+                        id="clinicalHint" 
+                        placeholder="Clinical indication (e.g., Patient with chest pain)..."
+                    ></textarea>
+                    
+                    <button type="submit" id="analyzeBtn">
+                        🔍 Analyze with AI
+                    </button>
+                </form>
+            </div>
+
+            <!-- Metadata Section -->
+            <div class="section" id="metadataSection" style="display: none;">
+                <div class="section-title">📋 DICOM Metadata</div>
+                <div id="metadata"></div>
+            </div>
+
+            <!-- Findings Section -->
+            <div class="section" id="findingsSection" style="display: none;">
+                <div class="section-title">🔍 AI Findings</div>
+                <div id="findingsList"></div>
+            </div>
+        </div>
+
+        <!-- Viewer -->
+        <div id="viewer">
+            <div class="placeholder">
+                <div class="placeholder-icon">🖼️</div>
+                <p>Upload a DICOM file to begin AI analysis</p>
+                <p style="font-size: 0.9rem; color: #4b5563; margin-top: 0.5rem;">
+                    AI findings will be overlaid on the image
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentData = null;
+        let scale = 1;
+
+        // File selection handler
+        document.getElementById('dicomFile').addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? `Selected: ${fileName}` : '';
+        });
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('dicomFile');
+            const clinicalHint = document.getElementById('clinicalHint').value;
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('statusText').textContent = 'Analyzing...';
+            document.getElementById('analyzeBtn').disabled = true;
+            document.getElementById('viewer').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>AI agents are analyzing your image...</p>
+                    <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+                        This may take 15-20 seconds
+                    </p>
+                </div>
+            `;
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('dicom_file', file);
+            formData.append('clinical_hint', clinicalHint);
+
+            try {
+                const response = await fetch(`${API_URL}/v1/analyze-dicom`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentData = data;
+                
+                // Display results
+                displayResults(data);
+                
+                document.getElementById('statusText').textContent = `Analysis Complete (${data.processing_time_ms}ms)`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('viewer').innerHTML = `
+                    <div class="placeholder">
+                        <div class="placeholder-icon">❌</div>
+                        <p style="color: #ef4444;">Error analyzing image</p>
+                        <p style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;">
+                            ${error.message}
+                        </p>
+                    </div>
+                `;
+                document.getElementById('statusText').textContent = 'Error';
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            // Show metadata
+            document.getElementById('metadataSection').style.display = 'block';
+            const metadataHtml = `
+                <div class="metadata-row">
+                    <span class="metadata-label">Study ID:</span>
+                    <span class="metadata-value">${data.study_id}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="metadata-label">Modality:</span>
+                    <span class="metadata-value">${data.metadata.modality}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="metadata-label">Patient ID:</span>
+                    <span class="metadata-value">${data.metadata.patient_id}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="metadata-label">Study Date:</span>
+                    <span class="metadata-value">${data.metadata.study_date}</span>
+                </div>
+                <div class="metadata-row">
+                    <span class="metadata-label">Dimensions:</span>
+                    <span class="metadata-value">${data.image_width} × ${data.image_height}</span>
+                </div>
+            `;
+            document.getElementById('metadata').innerHTML = metadataHtml;
+
+            // Show findings
+            document.getElementById('findingsSection').style.display = 'block';
+            const findingsHtml = data.findings.map((finding, idx) => {
+                const isAbnormal = finding.severity !== 'normal';
+                return `
+                    <div class="finding-item ${isAbnormal ? 'abnormal' : ''}" 
+                         onclick="highlightBox(${idx})"
+                         data-idx="${idx}">
+                        <div style="font-weight: 500; margin-bottom: 0.5rem;">
+                            Finding ${idx + 1}
+                        </div>
+                        <div style="font-size: 0.9rem; color: #d1d5db;">
+                            ${finding.text.substring(0, 100)}...
+                        </div>
+                        <div class="finding-confidence">
+                            Confidence: ${(finding.confidence * 100).toFixed(0)}% | 
+                            Severity: ${finding.severity}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('findingsList').innerHTML = findingsHtml;
+
+            // Display image with overlay
+            displayImageWithOverlay(data);
+        }
+
+        function displayImageWithOverlay(data) {
+            const viewerDiv = document.getElementById('viewer');
+            
+            // Create image element
+            const img = new Image();
+            img.id = 'medicalImage';
+            img.src = `data:image/png;base64,${data.image_base64}`;
+            
+            img.onload = function() {
+                // Create container
+                const container = document.createElement('div');
+                container.id = 'imageContainer';
+                container.style.position = 'relative';
+                
+                // Add image
+                container.appendChild(img);
+                
+                // Create canvas for overlay
+                const canvas = document.createElement('canvas');
+                canvas.id = 'canvas';
+                canvas.width = img.width;
+                canvas.height = img.height;
+                canvas.style.position = 'absolute';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                
+                container.appendChild(canvas);
+                
+                // Clear viewer and add container
+                viewerDiv.innerHTML = '';
+                viewerDiv.appendChild(container);
+                
+                // Add impression if exists
+                if (data.impression) {
+                    const impressionDiv = document.createElement('div');
+                    impressionDiv.id = 'impression';
+                    impressionDiv.innerHTML = `
+                        <div class="impression-title">💡 Clinical Impression</div>
+                        <div class="impression-text">${data.impression}</div>
+                    `;
+                    viewerDiv.appendChild(impressionDiv);
+                }
+                
+                // Draw bounding boxes
+                drawBoundingBoxes(canvas, data.findings, img.width, img.height);
+            };
+        }
+
+        function drawBoundingBoxes(canvas, findings, imgWidth, imgHeight) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            findings.forEach((finding, idx) => {
+                const bbox = finding.bbox;
+                
+                // Convert percentage to pixels
+                const x = (bbox.x / 100) * imgWidth;
+                const y = (bbox.y / 100) * imgHeight;
+                const width = (bbox.width / 100) * imgWidth;
+                const height = (bbox.height / 100) * imgHeight;
+                
+                // Draw rectangle
+                ctx.strokeStyle = bbox.color;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x, y, width, height);
+                
+                // Draw semi-transparent fill
+                ctx.fillStyle = bbox.color + '20'; // 20 = 12% opacity
+                ctx.fillRect(x, y, width, height);
+                
+                // Draw label
+                ctx.fillStyle = bbox.color;
+                ctx.font = 'bold 16px sans-serif';
+                ctx.fillText(`Finding ${idx + 1}`, x + 5, y - 8);
+                
+                // Draw confidence badge
+                ctx.fillStyle = '#000';
+                ctx.fillRect(x + 5, y + 5, 80, 24);
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px sans-serif';
+                ctx.fillText(`${(finding.confidence * 100).toFixed(0)}% conf`, x + 10, y + 20);
+            });
+        }
+
+        function highlightBox(idx) {
+            // Highlight the selected finding's box
+            const canvas = document.getElementById('canvas');
+            if (!canvas || !currentData) return;
+            
+            const ctx = canvas.getContext('2d');
+            const img = document.getElementById('medicalImage');
+            
+            // Redraw all boxes
+            drawBoundingBoxes(canvas, currentData.findings, img.width, img.height);
+            
+            // Highlight selected
+            const finding = currentData.findings[idx];
+            const bbox = finding.bbox;
+            const x = (bbox.x / 100) * img.width;
+            const y = (bbox.y / 100) * img.height;
+            const width = (bbox.width / 100) * img.width;
+            const height = (bbox.height / 100) * img.height;
+            
+            // Draw pulsing highlight
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 5;
+            ctx.setLineDash([10, 5]);
+            ctx.strokeRect(x - 5, y - 5, width + 10, height + 10);
+            ctx.setLineDash([]);
+            
+            // Scroll finding into view
+            const findingElement = document.querySelector(`[data-idx="${idx}"]`);
+            if (findingElement) {
+                findingElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        console.log('LuminaMed AI Overlay Viewer initialized');
+        console.log('API endpoint:', API_URL);
+    </script>
+</body>
+</html>

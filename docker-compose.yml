@@ -1,0 +1,49 @@
+﻿version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: luminamed-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+
+  orthanc:
+    image: jodogne/orthanc-plugins:latest
+    container_name: luminamed-orthanc
+    ports:
+      - "8042:8042"
+      - "4242:4242"
+    volumes:
+      - orthanc-data:/var/lib/orthanc/db
+      - ./infra/docker/orthanc/orthanc.json:/etc/orthanc/orthanc.json:ro
+    environment:
+      - ORTHANC_NAME=LuminaMed PACS
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: luminamed-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+volumes:
+  qdrant-data:
+    driver: local
+  redis-data:
+    driver: local
+  orthanc-data:
+    driver: local
+
+networks:
+  default:
+    name: luminamed-network

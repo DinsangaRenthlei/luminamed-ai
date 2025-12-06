@@ -1,0 +1,21 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+.venv/
+.env
+*.log
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Medical data (NEVER commit PHI)
+*.dcm
+test_data/
+
+# Models
+*.pt
+*.onnx
+
+# Node
+node_modules/
+.next/
