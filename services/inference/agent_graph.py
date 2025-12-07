@@ -39,46 +39,49 @@ def create_report_graph():
     
     # Define agent nodes
     def findings_agent(state: GraphState) -> GraphState:
-        """Extract findings from image with RAG grounding."""
-        from services.rag.vector_store import get_knowledge_store
+        """Extract findings from image with optional RAG grounding."""
         
-        # Search knowledge base for relevant medical knowledge
-        knowledge_store = get_knowledge_store()
-        clinical_context = f"{state['modality']} {state['clinical_hint']}"
-        relevant_knowledge = knowledge_store.search(
-            query=clinical_context,
-            limit=3,
-            score_threshold=0.0
-        )
+        # Try to use RAG if available (graceful degradation)
+        knowledge_context = ""
+        try:
+            from services.rag.vector_store import get_knowledge_store
+            knowledge_store = get_knowledge_store()
+            clinical_context = f"{state['modality']} {state['clinical_hint']}"
+            relevant_knowledge = knowledge_store.search(
+                query=clinical_context,
+                limit=3,
+                score_threshold=0.0
+            )
+            knowledge_context = "\n\n".join([
+                f"Medical Reference: {k['text']} (Source: {k['source']})"
+                for k in relevant_knowledge
+            ])
+        except (ImportError, Exception) as e:
+            # RAG not available - continue without it
+            print(f"RAG not available, continuing without knowledge grounding: {e}")
+            knowledge_context = ""
         
-        # Build knowledge context
-        knowledge_context = "\n\n".join([
-            f"Medical Reference: {k['text']} (Source: {k['source']})"
-            for k in relevant_knowledge
-        ])
-        
-        prompt = f"""You are a specialist radiologist analyzing a {state['modality']} image.
+        # Build prompt
+        base_prompt = f"""You are a specialist radiologist analyzing a {state['modality']} image.
 
 Clinical Context: {state['clinical_hint']}
 
-Medical Knowledge References:
-{knowledge_context}
+{f'Medical Knowledge References:\n{knowledge_context}\n' if knowledge_context else ''}
 
 Task: Identify ALL clinically significant findings. For each finding:
 1. Describe the finding precisely
 2. Specify exact anatomical location
 3. Assess severity (normal/mild/moderate/severe)
 4. Provide confidence score (0.0-1.0)
-5. Ground findings in the medical references provided
 
 Be thorough but ONLY report findings actually visible in the image. If normal, state "No acute findings".
-Reference the medical knowledge sources when applicable."""
+{f'Reference the medical knowledge sources when applicable.' if knowledge_context else ''}"""
 
         # For multimodal, include image
         if settings.use_multimodal and state.get('image_base64'):
             message = HumanMessage(
                 content=[
-                    {"type": "text", "text": prompt},
+                    {"type": "text", "text": base_prompt},
                     {
                         "type": "image_url",
                         "image_url": {"url": f"data:image/jpeg;base64,{state['image_base64']}"}
@@ -86,19 +89,18 @@ Reference the medical knowledge sources when applicable."""
                 ]
             )
         else:
-            message = HumanMessage(content=prompt)
+            message = HumanMessage(content=base_prompt)
         
         response = llm.invoke([message])
         
-        # Parse findings with citations
+        # Parse findings
         findings_text = response.content
         state['findings'] = [
             {
                 "text": findings_text,
                 "location": "chest",
                 "severity": "normal",
-                "confidence": 0.85,
-                "citations": [k['source'] for k in relevant_knowledge]
+                "confidence": 0.85
             }
         ]
         
