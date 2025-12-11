@@ -1,369 +1,219 @@
-﻿# LuminaMed AI
+# ?? LuminaMed-AI v2.0
 
-<div align="center">
+> **Multi-agent radiology report generation with verifiable AI**
 
-![LuminaMed Logo](https://via.placeholder.com/600x150/2563eb/ffffff?text=LuminaMed+AI)
+[![Production](https://img.shields.io/badge/Status-Production-success)]()
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115.5-009688)]()
+[![Next.js](https://img.shields.io/badge/Next.js-15.0.3-black)]()
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.29.0-FF4B4B)]()
+[![Python](https://img.shields.io/badge/Python-3.12-3776AB)]()
+[![License](https://img.shields.io/badge/License-MIT-blue)]()
 
-**Next-generation radiology report generation platform with verifiable multi-modal AI**
+## ?? Overview
 
-[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-00a393.svg)](https://fastapi.tiangolo.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+LuminaMed-AI is a production-grade medical AI platform that generates comprehensive radiology reports using multi-agent orchestration with Google Gemini 2.5. The system provides both clinical-grade technical reports for radiologists and plain-language explanations for patients, bridging the gap in medical communication.
 
-[Live Demo](https://luminamed.app) • [Documentation](docs/) • [Research Paper](docs/research.md)
+**Live Demo:**
+- ?? [Radiologist Portal](https://radiologist-portal-production.up.railway.app) - Professional report generation
+- ?? [Patient Portal](https://patient-portal-production-1b11.up.railway.app) - Plain language explanations
+- ?? [API Documentation](https://luminamed-ai-production.up.railway.app/docs) - OpenAPI/Swagger
 
-</div>
+## ? Key Features
 
----
+### ?? Multi-Agent AI System
+- **Findings Agent**: Analyzes medical images using vision-language models
+- **Impression Agent**: Synthesizes clinical impressions from findings
+- **Coding Agent**: Generates ICD-10 and CPT medical billing codes
+- **Verification Agent**: Validates reports for hallucinations (92% avg confidence)
 
-## 🎯 Overview
+### ?? Dual-Persona Output
+- **Technical Reports**: Professional radiology reports with LOINC/SNOMED terminology
+- **Patient Explanations**: Plain language summaries at multiple reading levels (5th-12th grade)
 
-LuminaMed AI is a production-ready radiology report generation platform that addresses the critical hallucination problem in medical AI through multi-agent orchestration and retrieval-augmented generation (RAG). The system reduces hallucinations from industry-standard 8% to under 3% while maintaining 92% verification confidence.
+### ?? Enterprise-Grade Features
+- **HIPAA Compliance**: Secure data handling and privacy controls
+- **FHIR R4 Compatible**: Interoperable with major EHR systems
+- **Production Monitoring**: Prometheus metrics + structured logging
+- **Verification System**: AI hallucination detection (avg 8% hallucination score)
 
-### Key Features
-
-- **🤖 Multi-Agent Architecture**: 4 specialized AI agents (Findings, Impression, Coding, Verification) orchestrated via LangGraph
-- **📚 RAG-Based Knowledge Grounding**: 50+ medical knowledge documents with citation-backed findings
-- **🩺 Complete Clinical Workflow**: Radiologist portal for report generation, review, and approval
-- **👥 Patient-Facing Interface**: Plain-language explanations with multi-level reading comprehension
-- **📊 Real-Time Analytics**: Quality metrics, performance monitoring, and trend analysis
-- **🖼️ Medical Image Viewer**: AI findings overlaid on DICOM images with interactive bounding boxes
-- **🔒 HIPAA-Compliant Architecture**: PHI detection, audit logging, secure processing
-
----
-
-## 🏗️ Architecture
+## ??? Architecture
 ```
-┌─────────────────────────────────────────────────────────┐
-│                   User Interfaces                       │
-│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐   │
-│  │ Radiologist  │ │   Patient    │ │  AI Overlay  │   │
-│  │   Portal     │ │   Portal     │ │    Viewer    │   │
-│  │ (Streamlit)  │ │  (Next.js)   │ │    (HTML)    │   │
-│  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘   │
-└─────────┼──────────────── ┼────────────────┼───────────┘
-          │                 │                │
-          └─────────────────┴────────────────┘
-                            ↓
-          ┌─────────────────────────────────┐
-          │      FastAPI Gateway            │
-          │  /v1/report  /v1/explain        │
-          │  /v1/analyze-dicom  /health     │
-          └────────────┬────────────────────┘
-                       │
-          ┌────────────┴────────────┐
-          │  LangGraph Orchestrator │
-          └────────────┬────────────┘
-                       │
-      ┌────────────────┼────────────────┐
-      │                │                │
-┌─────▼─────┐  ┌──────▼──────┐  ┌─────▼──────┐
-│ Findings  │  │ Impression  │  │ Verifier   │
-│  Agent    │  │   Agent     │  │   Agent    │
-└─────┬─────┘  └──────┬──────┘  └─────┬──────┘
-      │                │                │
-      └────────────────┴────────────────┘
-                       │
-          ┌────────────▼────────────┐
-          │   Qdrant Vector DB      │
-          │ Medical Knowledge Base  │
-          └─────────────────────────┘
++-------------------------------------------------------------+
+�                   LuminaMed-AI Platform                      �
++-------------------------------------------------------------�
+�                                                              �
+�  +--------------+    +--------------+    +--------------+ �
+�  � Radiologist  �    �  Patient     �    �   Backend    � �
+�  �   Portal     �---?�   Portal     �?---�   API        � �
+�  �  (Streamlit) �    �  (Next.js)   �    �  (FastAPI)   � �
+�  +--------------+    +--------------+    +--------------+ �
+�                                                   �          �
+�                                          +--------?-------+ �
+�                                          �   Multi-Agent  � �
+�                                          �   Orchestrator � �
+�                                          �   (LangGraph)  � �
+�                                          +----------------+ �
+�                                                   �          �
+�                                          +--------?-------+ �
+�                                          � Google Gemini  � �
+�                                          �   2.5 Flash    � �
+�                                          +----------------+ �
++-------------------------------------------------------------+
 ```
 
----
+## ??? Tech Stack
 
-## 🚀 Quick Start
+### Backend
+- **FastAPI 0.115** - High-performance async API framework
+- **LangGraph 0.2** - Multi-agent orchestration
+- **LangChain** - LLM integration and prompt engineering
+- **Google Gemini 2.5 Flash** - Vision-language model for medical imaging
+- **PostgreSQL + SQLAlchemy** - Production database
+- **Qdrant** - Vector database for RAG-enhanced diagnoses
+- **Redis** - Caching and session management
+
+### Frontend
+- **Radiologist Portal**: Streamlit 1.29 (Python)
+- **Patient Portal**: Next.js 15 + TypeScript + Tailwind CSS
+- **Interactive Charts**: Plotly.js for analytics dashboards
+- **Responsive Design**: Mobile-first, WCAG 2.1 compliant
+
+### Infrastructure
+- **Deployment**: Railway (3 microservices)
+- **Monitoring**: Prometheus + Structlog
+- **CI/CD**: GitHub Actions with automated deployments
+
+## ?? Quick Start
 
 ### Prerequisites
+- Python 3.12+
+- Node.js 22+
+- Google API Key ([Get one here](https://aistudio.google.com/app/apikey))
 
-- Python 3.11+
-- Docker & Docker Compose
-- Node.js 18+ (for patient portal)
-- Google AI API Key ([Get it here](https://aistudio.google.com/))
-
-### Installation
+### Local Development
 ```bash
 # Clone repository
-git clone https://github.com/your-username/luminamed-ai.git
+git clone https://github.com/CrillyPienaah/luminamed-ai.git
 cd luminamed-ai
 
-# Create virtual environment
+# Backend API
+cd apps/api
 python -m venv .venv
-.venv\Scripts\Activate.ps1  # Windows
-# source .venv/bin/activate  # Mac/Linux
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r ../../requirements.txt
+cp .env.example .env  # Add your GOOGLE_API_KEY
+uvicorn app.main:app --reload
 
-# Install dependencies
-pip install poetry
-poetry install
+# Radiologist Portal
+cd apps/radiologist
+pip install -r requirements.txt
+streamlit run app.py
 
-# Configure environment
-cp .env.example .env
-# Edit .env and add your GOOGLE_API_KEY
-
-# Start infrastructure
-docker-compose up -d
-
-# Load medical knowledge
-python services/rag/load_knowledge.py
-
-# Start API
-python -m uvicorn apps.api.app.main:app --reload
+# Patient Portal
+cd apps/consumer
+npm install
+npm run dev
 ```
 
-**API**: http://localhost:8000  
-**Docs**: http://localhost:8000/docs
+## ?? Performance Metrics
 
----
+| Metric | Value |
+|--------|-------|
+| Avg Report Generation Time | 16-20 seconds |
+| Verification Confidence | 92% |
+| Hallucination Rate | 8% |
+| Supported Modalities | X-Ray, CT, MRI, Ultrasound |
+| Reading Levels | 3 (Basic, Intermediate, Advanced) |
 
-## 💻 Running All Services
-```bash
-# Terminal 1: FastAPI Backend
-python -m uvicorn apps.api.app.main:app --reload
+## ?? Clinical Validation
 
-# Terminal 2: Radiologist Portal
-streamlit run apps/radiologist/app.py
+Successfully analyzed and generated reports for:
+- ? Lung cancer screening (mass detection with 100% confidence)
+- ? Breast mammography (BI-RADS classification)  
+- ? Chest X-rays (pneumonia, pleural effusion, normal findings)
+- ? Multi-pathology cases (cardiomegaly, atelectasis, etc.)
 
-# Terminal 3: Patient Portal
-cd apps/consumer && npm run dev
-
-# Terminal 4: Docker Services
-docker-compose up -d
+## ?? Project Structure
+```
+luminamed-ai/
++-- apps/
+�   +-- api/              # FastAPI backend
+�   �   +-- app/
+�   �   �   +-- main.py   # API endpoints
+�   �   �   +-- config.py # Settings management
+�   �   +-- routers/      # Modular endpoints
+�   +-- radiologist/      # Streamlit radiologist interface
+�   �   +-- app.py        # Main application
+�   �   +-- requirements.txt
+�   +-- consumer/         # Next.js patient portal
+�       +-- app/
+�       �   +-- page.tsx  # Main UI
+�       �   +-- layout.tsx
+�       +-- package.json
++-- services/
+�   +-- inference/
+�   �   +-- agent_graph.py  # LangGraph orchestration
+�   +-- rag/
+�       +-- vector_store.py # Knowledge grounding
++-- packages/
+�   +-- types.py          # Shared Pydantic models
++-- requirements.txt      # Python dependencies
 ```
 
----
+## ?? Security & Compliance
 
-## 📊 Performance Metrics
+- **HIPAA Compliant**: No PHI stored, encrypted in transit
+- **Data Privacy**: Local-first processing option
+- **Audit Logging**: Complete request tracing
+- **Rate Limiting**: Built-in throttling and quota management
 
-| Metric | Value | Industry Standard |
-|--------|-------|-------------------|
-| **Processing Time** | 17.2s avg | 20-30s |
-| **Verification Confidence** | 92% | 80-85% |
-| **Hallucination Rate** | 8% | 10-15% |
-| **Uptime** | 99.5%+ | 99% |
-| **Report Approval Rate** | 100% | 85-90% |
+## ?? Roadmap
 
----
+- [ ] **DICOM Native Support**: Direct .dcm file processing
+- [ ] **Multi-language**: Spanish, French, Mandarin support
+- [ ] **3D Visualization**: CT/MRI slice viewer with AI overlays
+- [ ] **EHR Integration**: Epic/Cerner FHIR connectors
+- [ ] **Voice Dictation**: Speech-to-text clinical notes
+- [ ] **Differential Diagnosis**: AI-powered DDx suggestions
 
-## 🔬 Research Contributions
+## ?? Use Cases
 
-### Novel Approach
+1. **Radiology Departments**: Automate preliminary report generation
+2. **Teleradiology**: Remote reading with AI assistance
+3. **Medical Education**: Teaching tool for radiology residents
+4. **Patient Engagement**: Improve health literacy
+5. **Research**: Large-scale retrospective analysis
 
-LuminaMed introduces a multi-agent architecture with explicit verification for radiology report generation:
+## ?? Contributing
 
-1. **RAG-Based Grounding**: Every finding is grounded in retrievable medical knowledge
-2. **Multi-Agent Verification**: Separate verification agent cross-checks findings
-3. **Citation Transparency**: All findings include source references
-4. **Clinical Safety**: Mismatch detection prevents inappropriate interpretations
+Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Evaluation
+## ?? License
 
-- **Datasets**: Tested on diverse chest X-ray, CT, and skeletal imaging
-- **Metrics**: RadGraph F1, hallucination rate, clinical appropriateness
-- **Baselines**: Compared against single-agent LLaVA-Med and MedGemma
-- **Human Evaluation**: Radiologist approval rate tracking
+MIT License - see [LICENSE](LICENSE) for details.
 
-See [Research Documentation](docs/research.md) for methodology details.
-
----
-
-## 🏥 Clinical Features
-
-### For Radiologists
-
-- ✅ **Upload & Generate**: DICOM/PNG/JPEG support with instant report generation
-- ✅ **Review Workflow**: Edit findings, approve reports, track changes
-- ✅ **Quality Dashboard**: Performance metrics, trend analysis, quality scores
-- ✅ **Knowledge Citations**: Every finding includes medical reference sources
-- ✅ **Safety Features**: Inappropriate study detection, hallucination warnings
-
-### For Patients
-
-- ✅ **Plain Language**: Reports explained at 6th, 8th, or 12th-grade reading levels
-- ✅ **Medical Glossary**: Interactive definitions of complex terms
-- ✅ **Visual Summaries**: Key takeaways highlighted
-- ✅ **Print-Friendly**: Professional PDF export
-
-### For Administrators
-
-- ✅ **Analytics**: Real-time quality metrics and usage statistics
-- ✅ **Monitoring**: Prometheus metrics, structured logging
-- ✅ **Audit Trails**: Complete record of all operations
-- ✅ **HIPAA Compliance**: PHI detection, de-identification, secure processing
-
----
-
-## 🛠️ Technology Stack
-
-**Backend:**
-- FastAPI 0.109+ (async Python web framework)
-- LangGraph 0.2+ (multi-agent orchestration)
-- Pydantic 2.5+ (data validation)
-- Structlog (structured logging)
-
-**AI/ML:**
-- Google Gemini 2.0 Flash (multimodal vision-language model)
-- LangChain (agent framework)
-- Sentence Transformers (embeddings)
-- Qdrant (vector database)
-
-**Frontend:**
-- Streamlit (radiologist portal)
-- Next.js 14 (patient portal)
-- Plotly (interactive charts)
-- Tailwind CSS (styling)
-
-**Infrastructure:**
-- Docker & Docker Compose
-- Orthanc (DICOM server)
-- Redis (caching)
-- Prometheus (metrics)
-- PostgreSQL (future: metrics storage)
-
----
-
-## 📁 Project Structure
-```
-luminamed-ai-v2/
-├── apps/
-│   ├── api/              # FastAPI backend
-│   │   └── app/
-│   │       ├── main.py   # API endpoints
-│   │       └── config.py # Configuration
-│   ├── radiologist/      # Streamlit radiologist portal
-│   │   └── app.py
-│   ├── consumer/         # Next.js patient portal
-│   │   └── app/
-│   └── viewer/           # Medical image viewers
-│       ├── index.html    # Orthanc embedded viewer
-│       └── ai-viewer.html # AI overlay viewer
-├── packages/
-│   └── types/            # Shared type definitions
-├── services/
-│   ├── inference/        # LangGraph agent orchestration
-│   ├── rag/              # Vector database & knowledge
-│   ├── dicom/            # DICOM processing utilities
-│   └── verification/     # Hallucination detection
-├── tests/                # Test suites
-├── infra/
-│   └── docker/           # Docker configurations
-└── docs/                 # Documentation
-```
-
----
-
-## 🧪 Testing
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=apps --cov=services --cov-report=html
-
-# Run specific test suite
-pytest tests/unit/test_report.py -v
-
-# Load test (requires Locust)
-locust -f tests/load/test_api.py
-```
-
----
-
-## 📈 Monitoring
-
-**Available Dashboards:**
-
-- **API Documentation**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
-- **Prometheus Metrics**: http://localhost:8000/metrics
-- **Qdrant Dashboard**: http://localhost:6333/dashboard
-- **Orthanc Explorer**: http://localhost:8042
-- **Radiologist Portal**: http://localhost:8501
-- **Patient Portal**: http://localhost:3000
-
----
-
-## 🔐 Security & Compliance
-
-### HIPAA Considerations
-
-- ✅ PHI auto-detection and de-identification
-- ✅ Audit logging for all operations
-- ✅ Secure API endpoints (authentication ready)
-- ✅ Encrypted data transmission (HTTPS in production)
-- ✅ Data retention policies (configurable)
-
-### FDA AI Device Pathway
-
-LuminaMed is designed with FDA's Predetermined Change Control Plan (PCCP) guidance in mind:
-- Model versioning and tracking
-- Performance monitoring
-- Bias detection and mitigation
-- Demographic fairness evaluation
-- Continuous learning capabilities
-
----
-
-## 🎓 For Researchers
-
-### Citing This Work
-```bibtex
-@software{luminamed2025,
-  author = {Christopher Crilly Pienaah},
-  title = {LuminaMed AI: Verifiable Multi-Modal Radiology Report Generation},
-  year = {2025},
-  publisher = {GitHub},
-  url = {https://github.com/your-username/luminamed-ai}
-}
-```
-
-### Research Directions
-
-- Verifiable generation with explicit citations
-- Multi-agent architectures for medical AI
-- Hallucination detection and mitigation
-- Clinical reasoning in vision-language models
-- Patient-centered AI communication
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
-
-## 📝 License
-
-MIT License - See [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Acknowledgments
-
-- Google Gemini API for multimodal capabilities
-- Qdrant for vector database
-- LangChain/LangGraph for agent orchestration
-- Orthanc for DICOM server
-- OHIF Viewer community
-
----
-
-## 📧 Contact
+## ????? Author
 
 **Christopher Crilly Pienaah**  
-AI/ML Product Strategist | Data Scientist
-Master's in Analytics, Northeastern University  
-Email: pienaah.c@northeastern.edu | ccpienaah@gmail.com  
-LinkedIn: (https://www.linkedin.com/in/christopher-crilly-pienaah)  
-Portfolio: LuminaMed Ai
+Master's in Analytics | Northeastern University  
+AI/ML Product Strategist | Founder, LuminaMed-AI
+
+- ?? [LinkedIn](https://linkedin.com/in/christopher-pienaah)
+- ?? [GitHub](https://github.com/CrillyPienaah)
+- ?? Email: pienaah.c@northeastern.edu
+
+## ?? Acknowledgments
+
+- Google Gemini Team for medical LLMs
+- LangChain/LangGraph for orchestration framework
+- Anthropic Claude for development assistance
+- Railway for deployment infrastructure
+
+## ?? Disclaimer
+
+**For Research and Educational Purposes Only**  
+This tool is not FDA-approved and should not be used for clinical diagnosis. All AI-generated reports must be reviewed by qualified radiologists.
 
 ---
 
-<div align="center">
-
-**Built with**: FastAPI • LangGraph • Gemini 2.0 • Qdrant • Streamlit • Next.js • Orthanc
-
-*Transforming radiology workflows with verifiable AI*
-
-</div>
+**Built with ?? for advancing medical AI and improving patient care**
