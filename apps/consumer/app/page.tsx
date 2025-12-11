@@ -199,7 +199,7 @@ export default function PatientPortal() {
                     Key Takeaway
                   </h3>
                   <p className="text-blue-900 leading-relaxed text-base">
-                    {explanation.summary || explanation.plain_language_summary || 
+                    {explanation.summary || 
                       "The report indicates normal results with no acute medical findings or immediate concerns, specifically noting that the lungs appear clear."}
                   </p>
                 </div>
@@ -209,7 +209,7 @@ export default function PatientPortal() {
                   <h3 className="text-xl font-bold text-gray-900 mb-4">Detailed Explanation</h3>
                   <div className="prose prose-blue max-w-none">
                     <p className="text-gray-700 leading-relaxed mb-4">
-                      {explanation.detailed_explanation || 
+                      {explanation.plain_language || 
                         "This is a great report! It tells us that the pictures taken (like an X-ray or CT scan) showed nothing seriously wrong."}
                     </p>
                     
@@ -337,3 +337,4 @@ The good news? There are no immediate red flags or concerning findings on this p
     </div>
   );
 }
+
